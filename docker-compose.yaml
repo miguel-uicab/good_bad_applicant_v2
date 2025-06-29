@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  api:
+    image: migueluicab/good-bad-applicant-api:v2
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8000:8000"
+    environment:
+      # Asegura que la API sepa que está en un entorno Docker
+      - DE_BUILD=docker
+    # Opcional: Reiniciar si se detiene inesperadamente
+    restart: unless-stopped
+
+  streamlit:
+    image: migueluicab/good-bad-applicant-streamlit:v2
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    ports:
+      - "8501:8501"
+    environment:
+      # La URL de la API, usando el nombre del servicio 'api'
+      - API_URL=http://api:8000
+    # Asegura que Streamlit se inicie después de la API
+    depends_on:
+      - api
+    restart: unless-stopped

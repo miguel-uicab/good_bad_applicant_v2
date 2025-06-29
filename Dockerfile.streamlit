@@ -1,0 +1,26 @@
+# Usa una imagen oficial de Python como imagen base
+FROM python:3.11-slim-bullseye
+
+# Establece el directorio de trabajo dentro del contenedor
+WORKDIR /app
+
+# Instala uv
+RUN pip install uv
+
+# Copia los archivos de gestión de dependencias
+COPY pyproject.toml uv.lock ./
+
+# Instala las dependencias usando uv
+RUN uv sync
+
+# Copia el código de la aplicación Streamlit
+COPY streamlit_app ./streamlit_app
+
+# Copia el archivo de datos necesario para la aplicación Streamlit
+COPY data/processed/df_with_target.sav ./data/processed/
+
+# Expone el puerto por defecto de Streamlit
+EXPOSE 8501
+
+# Comando para ejecutar la aplicación Streamlit
+CMD ["uv", "run", "streamlit", "run", "streamlit_app/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]

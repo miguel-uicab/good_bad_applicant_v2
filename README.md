@@ -87,3 +87,11 @@ docker-compose up
 ```bash
 docker-compose down
 ```
+
+```bash
+docker image push migueluicab/good-bad-applicant-streamlit:latest
+```
+
+```bash
+docker image push migueluicab/good-bad-applicant-api:latest
+```

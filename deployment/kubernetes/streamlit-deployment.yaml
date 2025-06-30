@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: good-bad-applicant-streamlit
+  name: good-bad-applicant-streamlit
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: good-bad-applicant-streamlit
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: good-bad-applicant-streamlit
+    spec:
+      containers:
+      - image: migueluicab/good-bad-applicant-streamlit:latest
+        name: good-bad-applicant-streamlit
+        ports:
+        - containerPort: 8501
+        env:
+        - name: API_URL
+          value: "http://good-bad-applicant-model:8000"
+        resources: {}
+status: {}

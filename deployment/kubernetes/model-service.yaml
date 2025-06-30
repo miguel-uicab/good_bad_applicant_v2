@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: good-bad-applicant-model
+  name: good-bad-applicant-model
+spec:
+  ports:
+  - name: "8000"
+    nodePort: 30100
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: good-bad-applicant-model
+  type: NodePort
+status:
+  loadBalancer: {}

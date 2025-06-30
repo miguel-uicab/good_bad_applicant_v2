@@ -72,6 +72,51 @@ Para ejecutar este proyecto localmente, asegúrate de tener **Docker** y **Docke
     *   **Documentación de la API:** Para interactuar con la API, ve a `http://localhost:8000/docs`.
     *   **Aplicación (Streamlit):** Abre tu navegador y ve a `http://localhost:8501`.
 
+## 🚢 Despliegue en Kubernetes
+
+Para desplegar la aplicación en un clúster de Kubernetes, puedes usar los manifiestos YAML proporcionados en el directorio `deployment/kubernetes`.
+
+**Prerrequisitos:**
+*   Tener `kubectl` instalado y configurado para apuntar a tu clúster.
+*   Las imágenes Docker de la API (`migueluicab/good-bad-applicant-api:latest`) y de Streamlit (`migueluicab/good-bad-applicant-streamlit:latest`) deben estar publicadas en un registro accesible por el clúster (como Docker Hub). El pipeline de CI/CD se encarga de este paso.
+
+**1. Desplegar los recursos:**
+
+Navega al directorio de los manifiestos y aplica la configuración. Este comando creará los `Deployments` para la API y la aplicación de Streamlit, junto con los `Services` de tipo `NodePort` para exponerlos.
+
+```bash
+cd deployment/kubernetes
+kubectl apply -f model-deployment.yaml -f model-service.yaml -f streamlit-deployment.yaml -f streamlit-service.yaml
+```
+
+**2. Acceder a la aplicación:**
+
+Para acceder a los servicios, necesitas la dirección IP de uno de los nodos de tu clúster.
+
+*   **Obtén la IP del nodo:**
+    ```bash
+    kubectl get nodes -o wide
+    ```
+    Busca la IP en la columna `INTERNAL-IP` o `EXTERNAL-IP`.
+
+*   **Accede a la aplicación Streamlit:**
+    Abre tu navegador y ve a `http://<IP_DEL_NODO>:30000`.
+
+*   **Accede a la API:**
+    La API estará disponible en `http://<IP_DEL_NODO>:30100`.
+
+    > **Nota para usuarios de `kind` y Docker Desktop:** Si estás usando un clúster local como `kind` o el que viene con Docker Desktop, es muy probable que puedas acceder directamente usando `localhost` en lugar de la IP del nodo.
+    > *   **Streamlit:** `http://localhost:30000`
+    > *   **API:** `http://localhost:30100`
+
+**3. Limpiar los recursos:**
+
+Para eliminar todos los recursos creados en el clúster, puedes usar el siguiente comando desde el mismo directorio `deployment/kubernetes`:
+
+```bash
+kubectl delete -f model-deployment.yaml -f model-service.yaml -f streamlit-deployment.yaml -f streamlit-service.yaml
+```
+
 ## ⚙️ Pipeline de MLOps
 
 Este proyecto utiliza un pipeline automatizado de MLOps definido en `.github/workflows/mlops-pipeline.yaml`. Este flujo de trabajo se activa con cada `push` o `pull request` a la rama `main` y consta de los siguientes jobs:

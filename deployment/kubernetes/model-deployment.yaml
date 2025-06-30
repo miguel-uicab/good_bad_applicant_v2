@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: good-bad-applicant-model
+  name: good-bad-applicant-model
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: good-bad-applicant-model
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: good-bad-applicant-model
+    spec:
+      containers:
+      - image: migueluicab/good-bad-applicant-api:latest
+        name: good-bad-applicant-api
+        ports:
+        - containerPort: 8000
+        resources: {}
+status: {}

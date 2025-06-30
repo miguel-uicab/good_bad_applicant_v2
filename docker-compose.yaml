@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   api:
-    image: migueluicab/good-bad-applicant-api:v2
+    image: migueluicab/good-bad-applicant-api:latest
     build:
       context: .
       dockerfile: Dockerfile.api
@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   streamlit:
-    image: migueluicab/good-bad-applicant-streamlit:v2
+    image: migueluicab/good-bad-applicant-streamlit:latest
     build:
       context: .
       dockerfile: Dockerfile.streamlit

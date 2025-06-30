@@ -1,97 +1,96 @@
-```bash
-cd deployment/mlflow
-docker compose -f docker-compose.yaml up -d
-docker compose ps
+# Good/Bad Applicant Classifier
+
+Este proyecto es una solución de Machine Learning de extremo a extremo diseñada para clasificar a los solicitantes de crédito como "buenos" o "malos" en función de su historial financiero y de aplicación. El objetivo es automatizar y mejorar la precisión del proceso de aprobación de créditos.
+
+La solución incluye una API de FastAPI para servir las predicciones del modelo y una aplicación web interactiva de Streamlit para una fácil utilización por parte de los usuarios finales.
+
+## 📋 Características Principales
+
+*   **Modelo de Clasificación:** Utiliza un modelo `HistogramGradientBoosting` para predecir la probabilidad de que un solicitante sea un buen o mal cliente.
+*   **API RESTful:** Una API robusta construida con **FastAPI** para servir predicciones en tiempo real. Incluye documentación interactiva con Swagger UI.
+*   **Interfaz de Usuario Web:** Una aplicación intuitiva desarrollada con **Streamlit** que permite a los usuarios introducir datos de un solicitante y recibir una clasificación al instante.
+*   **Contenerización:** Todo el proyecto está contenerizado con **Docker**, permitiendo una configuración y despliegue sencillos y reproducibles.
+*   **Pipeline de MLOps Automatizado:** Un pipeline de CI/CD con **GitHub Actions** que automáticamente prueba el código, entrena el modelo, lo registra con **MLflow** y publica las imágenes de la API y la aplicación de Streamlit en Docker Hub.
+
+## 🛠️ Pila Tecnológica
+
+*   **Backend:** Python, FastAPI
+*   **Frontend:** Streamlit
+*   **Machine Learning:** Scikit-learn, Xgboost, Pandas, MLflow
+*   **Despliegue:** Docker, Docker Compose
+*   **CI/CD:** GitHub Actions
+
+## 📂 Estructura del Proyecto
+
+```
+good_bad_applicant_v2/
+├── .github/workflows/mlops-pipeline.yaml  # Pipeline de CI/CD
+├── data/                                  # Datos crudos y procesados
+├── models/                                # Modelo entrenado
+├── notebooks/                             # Jupyter Notebooks para análisis y experimentación
+├── src/
+│   ├── api/                               # Código fuente de la API (FastAPI)
+│   └── models/                            # Scripts para entrenamiento de modelos
+├── streamlit_app/                         # Código fuente de la App (Streamlit)
+├── tests/                                 # Pruebas unitarias y de integración
+├── docker-compose.yaml                    # Orquestador de servicios locales
+├── Dockerfile.api                         # Dockerfile para la API
+├── Dockerfile.streamlit                   # Dockerfile para la App de Streamlit
+└── README.md                              # Este archivo
 ```
 
+## 🚀 Cómo Empezar
 
-```bash
-python src/models/train_model.py   --config configs/model_config.yaml   --data data/processed/df_cleaned_featured.sav   --models-dir models   --mlflow-tracking-uri http://localhost:5555
-```
+Para ejecutar este proyecto localmente, asegúrate de tener **Docker** y **Docker Compose** instalados.
 
-### Prueba de la API
+1.  **Clona el repositorio:**
+    ```bash
+    git clone https://github.com/your-username/good_bad_applicant_v2.git
+    cd good_bad_applicant_v2
+    ```
 
-Para probar la API localmente, primero asegúrate de que la aplicación FastAPI esté corriendo (por ejemplo, usando `uv run uvicorn src.api.main:app --host 0.0.0.0 --port 8000`). Luego, puedes enviar una solicitud POST al endpoint `/predict` con el siguiente payload:
+2. **Crea el ambiente virtual de python usando UV:**
+   Si se quiere correr los notebooks en local, hay que crear el ambiente,
+   ```bash
+   uv venv --python=python3.11
+   source .venv/bin/activate
+   ```
+   e instalar las dependencias,
+   
+   ```bash
+   uv pip install -r requirements.txt
+   ```
 
-```bash
-curl -X POST "http://localhost:8000/predict" \
-     -H "Content-Type: application/json" \
-     -d '{
-    "FLAG_OWN_CAR": "Y",
-    "FLAG_OWN_REALTY": "Y",
-    "CNT_CHILDREN": 0,
-    "AMT_INCOME_TOTAL": 216000.0,
-    "NAME_INCOME_TYPE": "Working",
-    "NAME_EDUCATION_TYPE": "Higher education",
-    "NAME_FAMILY_STATUS": "Married",
-    "NAME_HOUSING_TYPE": "House / apartment",
-    "DAYS_BIRTH": -18529,
-    "DAYS_EMPLOYED": -1809,
-    "FLAG_WORK_PHONE": 0,
-    "FLAG_PHONE": 0,
-    "FLAG_EMAIL": 0,
-    "OCCUPATION_TYPE": "Secretaries"
-}'
-```
+3.  **Levanta los servicios con Docker Compose:**
+    Este comando construirá las imágenes y levantará los contenedores para la API y la aplicación de Streamlit.
+    ```bash
+    docker-compose up --build
+    ```
 
-```bash
-uvicorn src.api.main:app --host 0.0.0.0 --port 8000
-```
+4.  **¡Listo! Accede a los servicios:**
+    *   **API (FastAPI):** Abre tu navegador y ve a `http://localhost:8000`.
+    *   **Documentación de la API:** Para interactuar con la API, ve a `http://localhost:8000/docs`.
+    *   **Aplicación (Streamlit):** Abre tu navegador y ve a `http://localhost:8501`.
 
-```bash
-docker image build -t migueluicab/good-bad-applicant-api:v1 -f Dockerfile.api .
-```
+## ⚙️ Pipeline de MLOps
 
-```bash
- docker run -p 8000:8000 migueluicab/good-bad-applicant-api:v1
- ```
+Este proyecto utiliza un pipeline automatizado de MLOps definido en `.github/workflows/mlops-pipeline.yaml`. Este flujo de trabajo se activa con cada `push` o `pull request` a la rama `main` y consta de los siguientes jobs:
 
-### Ejecución de Pruebas Unitarias
+1.  **`test`**:
+    *   Instala las dependencias.
+    *   Ejecuta las pruebas con `pytest` para garantizar la calidad y estabilidad del código.
 
-Para ejecutar las pruebas unitarias del proyecto, asegúrate de tener el ambiente virtual activado y `pytest` instalado. Luego, ejecuta el siguiente comando desde la raíz del proyecto:
+2.  **`train-and-register-model`**:
+    *   Si las pruebas pasan, este job entrena el modelo de clasificación.
+    *   Inicia un servidor de **MLflow** temporal para registrar el experimento, las métricas y el modelo entrenado.
+    *   Guarda el modelo (`good_bad_applicant_model.pkl`) como un artefacto para el siguiente paso.
 
-```bash
-uv run pytest tests/api
-```
+3.  **`build-and-publish-api` y `build-and-publish-streamlit`**:
+    *   Estos jobs se ejecutan en paralelo una vez que el modelo ha sido entrenado.
+    *   **`build-and-publish-api`**: Descarga el artefacto del modelo, construye la imagen Docker de la API usando `Dockerfile.api` y la publica en Docker Hub.
+    *   **`build-and-publish-streamlit`**: Construye la imagen Docker de la aplicación de Streamlit usando `Dockerfile.streamlit` y la publica en Docker Hub.
 
-### Ejecución de la Aplicación Streamlit
+## 🤝 Contribuciones
 
-Para levantar la aplicación Streamlit, asegúrate de tener el ambiente virtual activado y `streamlit` instalado. Luego, ejecuta el siguiente comando desde la raíz del proyecto:
+Las contribuciones son bienvenidas. Si deseas mejorar este proyecto, por favor haz un fork del repositorio y crea un Pull Request.
 
-```bash
-uv run streamlit run streamlit_app/app.py
-```
-
-```bash
-docker build -t migueluicab/good-bad-applicant-streamlit:v1 -f Dockerfile.streamlit .
-```
-
-
-
-```bash
-docker run -p 8501:8501 migueluicab/good-bad-applicant-streamlit:v1
-```
-
-```bash
-http://localhost:8501/
-```
-
-```bash
-docker-compose up --build
-```
-
-```bash
-docker-compose up
-```
-
-```bash
-docker-compose down
-```
-
-```bash
-docker image push migueluicab/good-bad-applicant-streamlit:latest
-```
-
-```bash
-docker image push migueluicab/good-bad-applicant-api:latest
-```

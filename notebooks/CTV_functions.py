@@ -9,6 +9,12 @@ import plotly.express as px
 def threshold_str(due_list=None):
     """
     Proporciona un string necesario para el titulo de las gráficas.
+
+    Args:
+        due_list (list): Lista de strings que representa las categorías de mora.
+
+    Returns:
+        str: Un string que representa el mínimo de días de atraso (e.g., '30', '60').
     """
     if ('1' in due_list) and (len(due_list) == 5):
         string = '30'
@@ -27,13 +33,21 @@ def threshold_str(due_list=None):
 def filter_integers(interval=None,
                     lst=None):
     """
-    Intervalos de tiempo para filtrar.
-    Las opciones son:
+    Filtra una lista de enteros basada en un intervalo de tiempo.
+
+    Las opciones para el intervalo son:
     1. "bimonthly": por bimestre.
     2. "quarterly": por trimestre.
     3. "four-month period": por cuatrimestre.
     4. "semester": por semestre.
     5. "yearly": anual.
+
+    Args:
+        interval (str): El intervalo de tiempo para filtrar.
+        lst (list): Una lista de enteros para ser filtrada.
+
+    Returns:
+        list: Una lista ordenada y filtrada de enteros.
     """
     sorted_lst = sorted(lst, reverse=True)
     if interval == "bimonthly":
@@ -53,7 +67,14 @@ def filter_integers(interval=None,
 def get_cohort_graph(df_vintage=None,
                      chosen_bucket=None):
     """
-    Se construye el gráfico de las cohorts.
+    Construye y muestra el gráfico de las cohorts.
+
+    Args:
+        df_vintage (pd.DataFrame): DataFrame que contiene los datos del análisis de cohorts.
+        chosen_bucket (list): Lista de strings con las categorías de mora para determinar el título.
+    
+    Returns:
+        None: Muestra una figura de Plotly.
     """
     threshold_value = threshold_str(chosen_bucket)
     fig = px.line(df_vintage,
@@ -75,6 +96,16 @@ def get_vintage_analysis(n=None,
     Aquí n se refiere a un entero positivo con el que se filtrarán
     las observaciones cuyas ventanas de observación (window)
     sean menores o igual a n.
+
+    Args:
+        n (int): Ventana de observación mínima para incluir un ID.
+        df_credit_extend (pd.DataFrame): El dataset de crédito extendido.
+        chosen_bucket (list): Lista de strings que representan los status de "mal solicitante".
+
+    Returns:
+        tuple: Una tupla conteniendo:
+            - df_vintage (pd.DataFrame): DataFrame con el análisis de cohorts.
+            - due_ids_in_cohorts (list): Una lista de listas con los IDs de los clientes "malos" por cohort.
     """
     # Se eliminan los ids cuya ventana de observación se menor que n.
     df_credit_extend_trunc = df_credit_extend[df_credit_extend['window'] >= n]
@@ -133,16 +164,23 @@ def get_vintage_analysis_by_interval(df_vintage=None,
                                      cohorts_list=None):
     """
     Hace un filtrado del análisis completo de cohorts usando
-    intervalos de tiempo.
+    intervalos de tiempo o una lista de cohorts.
+
     Depende de la la tabla resultante de la función "get_vintage_analysis".
-    Las opciones son:
+    Las opciones para time_interval son:
     1. "bimonthly": por bimestre.
     2. "quarterly": por trimestre.
     3. "four-month period": por cuatrimestre.
     4. "semester": por semestre.
     5. "yearly": anual.
-    También permite graficar las cohorts de interés. Aquí, necesariamente
-    el parámetro time_interval debe ser None.
+    
+    Args:
+        df_vintage (pd.DataFrame): El resultado de `get_vintage_analysis`.
+        time_interval (str, optional): El intervalo de tiempo para filtrar.
+        cohorts_list (list, optional): Una lista específica de cohorts para filtrar.
+
+    Returns:
+        pd.DataFrame: El DataFrame del análisis de cohorts filtrado.
     """
     if time_interval:
         lst_opening_month = df_vintage['opening_month'].unique().tolist()
@@ -161,6 +199,14 @@ def get_mean_cohort(df_vintage=None,
     Cálcula el "cohort medio" a través del promedio
     de las frecuencias acumuladas vistas en
     cada month_on_book.
+
+    Args:
+        df_vintage (pd.DataFrame): Los datos del análisis de cohorts.
+        chosen_bucket (list): Lista de strings con las categorías de mora para el título.
+        with_graph (bool): Si es True, muestra un gráfico.
+
+    Returns:
+        pd.DataFrame: Un DataFrame con los porcentajes del cohort promedio.
     """
     threshold_value = threshold_str(chosen_bucket)
     df_vintage_pivot = df_vintage.pivot(index='opening_month',
@@ -191,7 +237,14 @@ def get_mean_cohort(df_vintage=None,
 
 def inner_join(df1, df2):
     """
-    Mergeo de bases de datos.
+    Realiza un inner join en dos DataFrames.
+
+    Args:
+        df1 (pd.DataFrame): El primer DataFrame.
+        df2 (pd.DataFrame): El segundo DataFrame.
+
+    Returns:
+        pd.DataFrame: El DataFrame resultado del merge.
     """
     df = pd.merge(df1,
                   df2,

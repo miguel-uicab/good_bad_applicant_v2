@@ -12,6 +12,13 @@ def get_data(name_sav=None,
              path=None):
     """
     Retorna un DataFrame derivado de un archivo binario.
+
+    Args:
+        name_sav (str): El nombre del archivo .sav.
+        path (str): La ruta al directorio que contiene el archivo.
+
+    Returns:
+        object: El objeto deserializado del archivo pickle (probablemente un DataFrame).
     """
     name_sav = pickle.load(open(f'{path}{name_sav}', 'rb'))
 
@@ -23,6 +30,13 @@ def get_count_missing(data=None,
     """
     Arroja un DataFrame con el conteo y el porcentaje de
     valores perdidos de cada variable float.
+
+    Args:
+        data (pd.DataFrame): El DataFrame de entrada.
+        feature_names (list): Una lista de nombres de features para chequear valores perdidos.
+
+    Returns:
+        pd.DataFrame: DataFrame con el conteo y porcentaje de valores perdidos.
     """
     count_missing = pd.DataFrame(data[feature_names].isna().sum())
     count_missing.reset_index(drop=False, inplace=True)
@@ -40,6 +54,13 @@ def remove_features_with_missing(count_missing=None,
     Devuelve una lista de variables cuyos porcentajes de valores perdidos
     no supera cierto umbral.
     Depende del resultado de la función get_count_missing.
+
+    Args:
+        count_missing (pd.DataFrame): El resultado de `get_count_missing`.
+        threshold (float): El umbral de porcentaje para remover variables.
+
+    Returns:
+        list: Una lista de nombres de features a mantener.
     """
     drop_by_missing = list(count_missing[count_missing['porcentaje']>=threshold]['name'])
     float_names_without_missing = total_float_names.copy()
@@ -55,6 +76,14 @@ def data_filter_by_upper_quantile(data=None,
     """
     Elimina outliers de cierta lista de variables float.
     Aquí, los outliers son aquellos valores que sobrepasan cierto umbral de cuantil superior.
+
+    Args:
+        data (pd.DataFrame): El DataFrame de entrada.
+        list_float_names (list): Lista de columnas float a filtrar.
+        upper_quantile (float): El cuantil superior a usar como umbral.
+
+    Returns:
+        pd.DataFrame: El DataFrame sin los outliers.
     """
     data_without_outliers = data.copy()
     for name in list_float_names:
@@ -71,6 +100,14 @@ def get_features_names_drop_by_corr(data=None,
     Devuelve una lista de variables que sobrepasan cierto valor de correlación
     con respecto a otras variables. Aquí, se ha usado la correlación no paramétrica
     de Spearman.
+
+    Args:
+        data (pd.DataFrame): El DataFrame de entrada.
+        list_feature_names (list): Lista de nombres de features a chequear por correlación.
+        threshold (float): El umbral de correlación.
+
+    Returns:
+        list: Una lista de nombres de features a eliminar.
     """
     corr_matrix = (data[list_feature_names].corr(method='spearman').abs())
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape),k=1).astype(bool))
@@ -84,6 +121,13 @@ def fillna_categoric_data(data=None,
     """
     Dada una lista de variables categóricas, imputa, en los
     valores perdidos, el valor de 'Unidentified'.
+
+    Args:
+        data (pd.DataFrame): El DataFrame de entrada.
+        list_names (list): Lista de columnas categóricas a rellenar.
+
+    Returns:
+        pd.DataFrame: El DataFrame con los valores perdidos rellenados.
     """
     data_copy = data.copy()
     for name in list_names:
@@ -103,6 +147,16 @@ def mutual_information_score(data=None,
     El resultado es un histograma con los valores de 
     información mutua en orden descendente y un dataframe con
     la información.
+
+    Args:
+        data (pd.DataFrame): El DataFrame de entrada.
+        feature_names (list): Lista de nombres de features (X).
+        y_label_name (str): El nombre de la variable objetivo (y).
+        list_bool_True (list): Una máscara booleana que indica qué features son discretas.
+        seed (int): Semilla aleatoria para reproducibilidad.
+
+    Returns:
+        pd.DataFrame: DataFrame con los features y sus puntajes de información mutua.
     """
     X_features = data[feature_names]
     y_labels = data[y_label_name]

@@ -68,8 +68,8 @@ Para ejecutar este proyecto localmente, se necesita tener **Docker** y **Docker 
    Para el seguimiento en el notebook de experimentos, se puede usar MLflow vía:
    ```bash
     cd deployment/mlflow
-    docker compose -f mlflow-docker-compose.yaml up -d
-    docker compose ps
+    docker-compose -f mlflow-docker-compose.yaml up -d
+    docker-compose ps
    ```
    Se puede acceder a MLflow UI en `http://localhost:5555`
 

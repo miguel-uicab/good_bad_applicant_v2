@@ -8,6 +8,12 @@ import pandas as pd
 def get_config(path: str = None):
     """
     Se carga el archivo config.yaml.
+
+    Args:
+        path (str, optional): Ruta al archivo de configuración. 
+
+    Returns:
+        dict: Un diccionario con la configuración del modelo.
     """
     if path is None:
         path = './configs/model_config.yaml'
@@ -23,6 +29,12 @@ def get_dataframe(json: dict = None) -> pd.DataFrame:
     Convierte una estructura json con la informarción básica payload
     en un DataFrame. El .T rota el DataFrame con el fin de obtener
     información tipo fila.
+
+    Args:
+        json (dict, optional): Un diccionario con los datos de entrada. 
+
+    Returns:
+        pd.DataFrame: Un DataFrame de pandas con la información del JSON.
     """
     df_json = pd.DataFrame.from_dict(json, orient='index').T
 
@@ -33,7 +45,14 @@ def fillna_categoric_data(data: pd.DataFrame = None,
                           list_names: list = None) -> pd.DataFrame:
     """
     Dada una lista de variables categóricas, imputa, en los
-    valores perdidos, el valor de 'No identificado'.
+    valores perdidos, el valor de 'Unidentified'.
+
+    Args:
+        data (pd.DataFrame, optional): El DataFrame a procesar.
+        list_names (list, optional): Lista de columnas categóricas a rellenar. 
+
+    Returns:
+        pd.DataFrame: El DataFrame con los valores faltantes imputados.
     """
     data_copy = data.copy()
     for name in list_names:
@@ -51,6 +70,13 @@ def get_feature_names_order(float_names: list = None,
     el orden de aparición de la variables queda como sigue:
     1. Tipo categórica.
     2. Tipo float.
+
+    Args:
+        float_names (list, optional): Lista de nombres de variables float.
+        categorical_names (list, optional): Lista de nombres de variables categóricas. 
+
+    Returns:
+        list: Una lista con el orden correcto de las variables.
     """
     feature_names_order = categorical_names + float_names
 
@@ -62,6 +88,13 @@ def transform_data_type_to_float(data: pd.DataFrame = None,
     """
     Dada una lista de variables de interés, se tranforman
     a tipo float.
+
+    Args:
+        data (pd.DataFrame, optional): El DataFrame a procesar. 
+        list_names (list, optional): Lista de columnas a transformar a float. 
+
+    Returns:
+        pd.DataFrame: El DataFrame con las columnas transformadas a tipo float.
     """
     data_copy = data.copy()
     for name in list_names:
@@ -73,6 +106,12 @@ def transform_data_type_to_float(data: pd.DataFrame = None,
 def NAME_EDUCATION_TYPE_class(education_type: str) -> str:
     """
     Tiene como tarea homogeneizar los valores de la variable "NAME_EDUCATION_TYPE".
+
+    Args:
+        education_type (str): El tipo de educación a clasificar.
+
+    Returns:
+        str: El valor homogeneizado del tipo de educación.
     """
     if education_type in ['Higher education', 'Academic degree']:
         return 'Higher education or Academic degree'
@@ -85,6 +124,12 @@ def NAME_EDUCATION_TYPE_class(education_type: str) -> str:
 def NAME_HOUSING_TYPE_clas(housing_type: str) -> str:
     """
     Tiene como tarea homogeneizar los valores de la variable "NAME_HOUSING_TYPE".
+
+    Args:
+        housing_type (str): El tipo de vivienda a clasificar.
+
+    Returns:
+        str: El valor homogeneizado del tipo de vivienda.
     """
     if housing_type in ['Rented apartment', 'Office apartment', 'Co-op apartment']:
         return 'Rented apartment or Office apartment or Co-op apartment'
@@ -95,6 +140,12 @@ def NAME_HOUSING_TYPE_clas(housing_type: str) -> str:
 def OCCUPATION_TYPE_class(occupation_type: str) -> str:
     """
     Tiene como tarea homogeneizar los valores de la variable "OCCUPATION_TYPE".
+
+    Args:
+        occupation_type (str): El tipo de ocupación a clasificar.
+
+    Returns:
+        str: El valor homogeneizado del tipo de ocupación.
     """
     if occupation_type in ['Cleaning staff', 'Private service staff', 'Secretaries',
                            'Waiters/barmen staff', 'Low-skill Laborers', 'IT staff',

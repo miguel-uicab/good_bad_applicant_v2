@@ -1,21 +1,6 @@
 model:
   best_model: HistGradientBoostingClassifier
   f1: 0.08584474885844749
-  list_variable_names: 
-  - FLAG_OWN_CAR
-  - FLAG_OWN_REALTY
-  - CNT_CHILDREN
-  - AMT_INCOME_TOTAL
-  - NAME_INCOME_TYPE
-  - NAME_EDUCATION_TYPE
-  - NAME_FAMILY_STATUS
-  - NAME_HOUSING_TYPE
-  - DAYS_BIRTH
-  - DAYS_EMPLOYED
-  - FLAG_WORK_PHONE
-  - FLAG_PHONE
-  - FLAG_EMAIL
-  - OCCUPATION_TYPE
   list_categorical_features:
   - FLAG_OWN_CAR
   - FLAG_OWN_REALTY

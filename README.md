@@ -53,7 +53,7 @@ Para ejecutar este proyecto localmente, se necesita tener **Docker** y **Docker 
     ```
 
 2. **Crear el ambiente virtual de python usando UV:**
-   Si se quiere correr los notebooks en local, hay que crear el ambiente,
+   Si se quiere correr los notebooks en local, hay que crear el ambiente:
    ```bash
    uv venv --python=python3.11
    source .venv/bin/activate
@@ -64,8 +64,17 @@ Para ejecutar este proyecto localmente, se necesita tener **Docker** y **Docker 
    uv pip install -r requirements.txt
    ```
 
+3. **Configurar MLflow para seguimiento de experimentos:**
+   Para el seguimiento en el notebook de experimentos, se puede usar MLflow vía:
+   ```bash
+    cd deployment/mlflow
+    docker compose -f mlflow-docker-compose.yaml up -d
+    docker compose ps
+   ```
+   Se puede acceder a MLflow UI en `http://localhost:5555`
+
 3.  **Levantar los servicios con Docker Compose:**
-    Este comando construirá las imágenes y levantará los contenedores para la API y la aplicación de Streamlit.
+    Este comando construirá las imágenes y levantará los contenedores para la API y la aplicación de Streamlit:
     ```bash
     docker-compose up --build
     ```
@@ -80,7 +89,7 @@ Para ejecutar este proyecto localmente, se necesita tener **Docker** y **Docker 
     *   **Aplicación (Streamlit):** Abrir el navegador y usar la url `http://localhost:8501`.
 
 5. **Pruebar la API:**
-   Se puede usar el siguiente paylod para probar la API en la términal.
+   Se puede usar el siguiente paylod para probar la API en la términal:
 
    ```bash
    curl -X POST "http://localhost:8000/predict" \
